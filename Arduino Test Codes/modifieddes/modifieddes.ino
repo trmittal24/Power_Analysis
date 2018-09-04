@@ -1,16 +1,16 @@
 void setup() {
-   Serial.begin(115200); // maximum baud rate
+ //  Serial.begin(115200); // maximum baud rate
    pinMode(11, OUTPUT);
    pinMode(12, OUTPUT);
 
    SREG &= ~0x80; // pervent power spikes at every 1 ms intervals
 }
-uint8_t state = 78;
-uint8_t key = 13;
-uint8_t left; // more significant 4 bits of state
-uint8_t right; // less significant 4 bits of state
-uint8_t swap; // the swapper variable
-uint8_t ct, dct;
+unsigned int state = 78;
+unsigned int key = 36 ;
+unsigned int left; // more significant 4 bits of state
+unsigned int right; // less significant 4 bits of state
+unsigned int swap; // the swapper variable
+unsigned int ct, dct;
 int count;
 
 void loop() {  
@@ -22,8 +22,9 @@ void loop() {
   PORTB &= ~0x10;
   
   // loop
-  for(count = 0; count < 4; count++)
+  for(count = 0; count < 8; count++)
   {
+    //PORTB |= 0x08;
     // operation performed only if key is odd
     if(key % 2)
     {
@@ -33,9 +34,10 @@ void loop() {
       right ^= key;
       left ^= right;
     }
-    
+
+    //PORTB &= ~0x08;
     // rotate key right
-    key = ((key >> 1) + (key << 3)) % 16;
+    key = ((key >> 1) + (key << 7)) % 256;
   }
   
   // reference signal to indicate end of loop
@@ -43,7 +45,7 @@ void loop() {
   
   // obtain encrypted value and send it
   ct = (left << 4) + right;
-  UDR0 = ct;
+ // UDR0 = ct;
   
   // decoding
   /*
