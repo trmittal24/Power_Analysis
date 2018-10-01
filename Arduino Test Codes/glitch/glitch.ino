@@ -48,16 +48,7 @@ void loop() {
 
 
 
-
-
-
-
-
-
-
-
-
-      Serial.println("boobs ");
+      Serial.println("Hurray!");
 
       
     }
