@@ -191,7 +191,7 @@ void printbits(uint64_t v)
 		{
 			printf("0");
 		}
-        else
+		else
 		{
 			printf("1");
 		}
@@ -616,7 +616,7 @@ int main(void)
 
 	// display the key and data
 	printf("key:\t\t");
-    printbits(key);
+	printbits(key);
 	printf("data:\t\t");
 	printbits(data);
 
