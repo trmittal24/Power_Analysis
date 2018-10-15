@@ -628,7 +628,7 @@ int main(void)
 	while(count--)
 	{
 		// initial permutation
-        Permutation(&data, true);
+		Permutation(&data, true);
 
 		// encryption or decryption mode
 		if(encrypt)
