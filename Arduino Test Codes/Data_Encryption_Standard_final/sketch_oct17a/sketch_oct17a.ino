@@ -19,7 +19,7 @@ int const InitialPermutation[64] =
 {   
   //PORTB ^= 0x10;
   
-  if(ii%3 != 0)
+  if(ii%5 != 0)
   {
     data_temp += (FIRSTBIT >> position_to);
     //*block *= ii ;
