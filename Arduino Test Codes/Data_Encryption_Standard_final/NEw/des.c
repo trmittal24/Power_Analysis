@@ -360,7 +360,6 @@ char perm[16][16][8];			/* 2K bytes defining perm. */
 	for (i=8, ob = outblock; i != 0; i--)
 		*ob++ = 0;
 
-
 	ib = inblock;
 	for (j = 0; j < 16; j += 2, ib++) { /* for each input nibble */
 		ob = outblock;
