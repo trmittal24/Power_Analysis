@@ -6,7 +6,7 @@ import numpy as np
 import sys
 
 # obtain the data of permutation of 0xAAAAAAAAAAAAAAAA
-bits_AA = scipy.io.loadmat('pattern_0xA.mat')
+bits_AA = scipy.io.loadmat('0-F_2018-10-30.mat')
 
 '''
 	above dictionary variable contains two-dimensional arrays
