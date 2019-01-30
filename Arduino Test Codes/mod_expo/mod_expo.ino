@@ -110,10 +110,10 @@ void loop()
 		{
 			M = M * temp % n;
 		}
-	else
-	{
-		waste = M * C;
-	}
+		else
+		{
+			waste = M * C;
+		}
 		d >>= 1;
 		temp = temp * temp % n;
 		PORTB &= ~0x10;
