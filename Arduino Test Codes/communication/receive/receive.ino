@@ -1,21 +1,10 @@
-/**
- *
- * HOW TO BREAK:
- *
- * LOOK FOR BLOCK-SPIKE-BLOCK REPRESENTING A 1 WHILE A BLOCK REPRESENTS A 0
- *
- * The MSB (last signature) will always be a '1' since the operations stop when exponent becomes 0.
- *
- *
- */
-
 uint64_t n, p, q, M, e, d, C, temp, waste;
 
 ////////////////////////////////////////////////////////////////////////////////
 
 void load_parameters()
 {
-//  p = 23831; q = 65657; e = 342202493; d = 34277;
+  p = 23831; q = 65657; e = 342202493; d = 34277;
 //  p = 88993; q = 652361; e = 25728589759; d = 65599;
 //  p = 82839349; q = 64629403; e = 663618299; d = 2324818243004987;
 //  p = 1598669; q = 9654637; e = 59796733427; d = 850022758091;
@@ -44,7 +33,7 @@ void load_parameters()
 //  p = 58756499; q = 485415883; d = 1466015503703; e = 19834803414905483;
 //  p = 5358751; q = 877845251; d = 366503875927; e = 130542716600863;
 //  p = 7657571; q = 986254613; d = 91625968981; e = 1643994285535421;
-  p = 752952671; q = 87525481; d = 22906492249; e = 42269236847669449;
+//  p = 752952671; q = 87525481; d = 22906492249; e = 42269236847669449;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -64,6 +53,27 @@ void print64(uint64_t num)
     Serial.print(*p--);
   }
   Serial.println();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+uint64_t receive()
+{
+  uint64_t ans = 0;
+  uint64_t num[8] = {0};
+  int k = 0;
+  while(Serial.available())
+  {
+    num[k] = Serial.read();
+    ans = ans + (num[k] << (8 * k));
+    k++;
+  }
+//  for(int i = 0; i < 8; i ++)
+//  {
+//    print64(num[i]);
+//  }
+  return ans;
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -101,20 +111,32 @@ void loop()
 
   int k=0;
   int num[8]= {0};
-  Serial.println("a");
+
+  uint64_t ans = receive();
+  print64(ans);
+  C = ans;
   
-  while(Serial.available())
-  {
-    num[k] = Serial.read();
-    Serial.println(num[k]);
-    k++;
-  }
+//  while(Serial.available())
+//  {
+//    num[k] = Serial.read();
+////    Serial.println(num[k]);
+//    k++;
+//  }
+//  Serial.println(num[0]);
+//  Serial.println(num[1]);
+//  Serial.println(num[2]);
+//  Serial.println(num[3]);
+//  Serial.println(num[4]);
+//  Serial.println(num[5]);
+//  Serial.println(num[6]);
+//  Serial.println(num[7]);
 
   //for(k=0;k<8;k++)
   //Serial.println(num[k]);
 
   
   // decrypt 'C' to get 'M'
+  C = C % n;
   M = 1;
   temp = C;
   PORTB |= 0x08;
@@ -134,6 +156,4 @@ void loop()
     PORTB &= ~0x10;
   }
   PORTB &= ~0x08;
-  //print64(M);
 }
-
