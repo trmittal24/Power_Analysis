@@ -1,14 +1,3 @@
-/**
- *
- * HOW TO BREAK:
- *
- * LOOK FOR BLOCK-SPIKE-BLOCK REPRESENTING A 1 WHILE A BLOCK REPRESENTS A 0
- *
- * The MSB (last signature) will always be a '1' since the operations stop when exponent becomes 0.
- *
- *
- */
-
 uint64_t n, p, q, M, e, d, C, temp, waste;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -44,7 +33,7 @@ void load_parameters()
 //  p = 58756499; q = 485415883; d = 1466015503703; e = 19834803414905483;
 //  p = 5358751; q = 877845251; d = 366503875927; e = 130542716600863;
 //  p = 7657571; q = 986254613; d = 91625968981; e = 1643994285535421;
-  //p = 752952671; q = 87525481; d = 22906492249; e = 42269236847669449;
+//  p = 752952671; q = 87525481; d = 22906492249; e = 42269236847669449;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -74,7 +63,6 @@ void setup()
   pinMode(12, OUTPUT);
   pinMode(11, OUTPUT);
   pinMode(2, OUTPUT);
-  SREG &= ~0x80;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -84,43 +72,46 @@ void loop()
   // set RSA parameters
   load_parameters();
   n = p * q;
-  M =12345678952387;
+  M = 843;
 
   // encrypt 'M' to get 'C'
+  M = M % n;
   C = 1;
   temp = M;
   while(e > 0)
   {
     if(e % 2)
     {
-      C = C * temp % n;
+      C = (C * temp) % n;
     }
-    e >>= 1;
-    temp = temp * temp % n;
+    e = e >> 1;
+    temp = (temp * temp) % n;
+//    print64(C);
   }
+//  Serial.println();
+//  print64(C);
   uint32_t x,y;
   uint64_t a;
     
 
   int k =0;
   a = (0x100000000);
-  x = M % a;
+  x = C % a;
   PORTB |= 0x10;
- // Serial.println("a");
-//  for(k=0; k<4; k++)
-//  {
-//    Serial.write(x%256);
-//    x = x >>8;
-//  }
-//
-//  x = M >> 32;
-//  
-//  for(k=0; k<4; k++)
-//  {
-//    Serial.write(x%256);
-//    x = x >>8;
-//  }
-Serial.write(24);
+  for(k=0; k<4; k++)
+  {
+    Serial.write(x%256);
+    x = x >>8;
+  }
+
+  x = C >> 32;
+  
+  for(k=0; k<4; k++)
+  {
+    Serial.write(x%256);
+    x = x >>8;
+  }
+//Serial.write(24);
   PORTB &= ~0x10;
   // decrypt 'C' to get 'M'
 //  M = 1;
@@ -144,4 +135,3 @@ Serial.write(24);
 //  PORTB &= ~0x08;
  // print64(M);
 }
-
