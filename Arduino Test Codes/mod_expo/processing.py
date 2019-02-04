@@ -31,7 +31,7 @@ def get_signatures(file, traces):
 	s = traces['Trace_2'][:, 1]
 	p = traces['Trace_3'][:, 1]
 	f = savitzky_golay(p, 35, 10)
-	# peak = maximum value - 0.22
+	# peak = maximum value - 0.03
 	# limit = 50
 	# threshold = Otsu's Thresholding on sequence lengths
 	# first = point where moving median drops
