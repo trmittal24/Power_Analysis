@@ -37,7 +37,7 @@ def get_signatures(file, traces):
 	# first = point where moving median drops
 	# last = point where moving median rises
 	peak, limit, threshold, first, last = scipy.io.loadmat('dpa.mat')[file][0]
-	# peak, limit, threshold, first, last = [-0.838, 50, 500, 3237, 23437]
+	# peak, limit, threshold, first, last = [-0.82446, 50, 400, 2318, 24241]
 	start = first
 	signatures = []
 	# for i in range(len(t)):
@@ -87,6 +87,8 @@ if __name__ == '__main__':
 		traces = scipy.io.loadmat(file)
 	except IndexError:
 		raise SystemExit('Enter file name as argument.') # use 4436988421939.mat for report
+	if file in ['44816101156119797339.mat', '6827596968971589571.mat']:
+		print('Unexpected spikes lead to wrong result.')
 	signatures = get_signatures(file, traces)
 	time = traces['Trace_1'][:, 0]
 	big_marker = traces['Trace_1'][:, 1]
@@ -118,10 +120,11 @@ if __name__ == '__main__':
 	# print('0b1' + ''.join(signatures[:: -1]))
 	pp.figure().canvas.set_window_title('RSA on Arduino')
 	pp.title('RSA Power Trace')
-	pp.plot(power, 'b-', label = 'power trace', linewidth = 0.8)
+	# pp.plot(power, 'b-', label = 'power trace', linewidth = 0.8)
+	pp.plot(filtered, 'r-', label = 'filtered power trace', linewidth = 0.8)
 	# pp.plot(filtered, 'r-', label = 'filtered power trace', linewidth = 0.8)
 	pp.plot(small_marker, 'g-', label = 'cycle marker', linewidth = 0.8)
-	pp.plot(big_marker, 'y-', label = 'operation marker', linewidth = 0.8)
+	# pp.plot(big_marker, 'y-', label = 'operation marker', linewidth = 0.8)
 	pp.xlabel('time / s')
 	pp.ylabel('voltage / V')
 	pp.legend()
