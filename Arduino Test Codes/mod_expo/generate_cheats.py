@@ -6,28 +6,54 @@ import numpy as np
 import scipy.io
 import sys
 
+################################################################################
+
 def otsu(gray):
+	'''
+		Given an array of integers, determine the best threshold to binarise the array.
+		https://stackoverflow.com/questions/48213278/implementing-otsu-binarization-from-scratch-python
+	'''
+
+	# set up the array for thresholding
 	pixel_number = len(gray)
-	mean_weigth = 1.0/pixel_number
+	mean_weigth = 1.0 / pixel_number
 	his, bins = np.histogram(gray, np.array(range(min(gray), max(gray))))
-	final_thresh = -1
-	final_value = -1
-	for t in bins[1:-1]:
+	final_thresh = -1 # initialisation
+	final_value = -1 # initialisation
+
+	# iterate over all except extreme values
+	for t in bins[1 : -1]:
+
+		# calculate inter-class variance
 		Wb = np.sum(his[:t]) * mean_weigth
 		Wf = np.sum(his[t:]) * mean_weigth
 		mub = np.mean(his[:t])
 		muf = np.mean(his[t:])
 		value = Wb * Wf * (mub - muf) ** 2
-		print("Wb", Wb, "Wf", Wf)
-		print("t", t, "value", value)
+		print('Wb', Wb, 'Wf', Wf)
+		print('t', t, 'value', value)
+
+		# best threshold maximises inter-class variance
 		if value > final_value:
 			final_thresh = t
 			final_value = value
-	final_img = gray.copy()
+
 	print(final_thresh)
 	return final_thresh
 
+################################################################################
+
 def savitzky_golay(y, window_size, order, deriv = 0, rate = 1):
+	'''
+		Savitzky-Golay Filter is a polynomial filter.
+		Given a set of consecutive samples (a window), fit a polynomial of the specified degree through them.
+		Perform this fitting for all possible windows in the input array.
+		Return the polynomial-fitted array as output.
+		This implementation seems to be faster than the built-in scipy.signal.savgol_filter function.
+		https://stackoverflow.com/questions/29251407/savitzky-golay-filter-plots-wrong-values
+	'''
+
+	# check arguments
 	try:
 		window_size = np.abs(np.int(window_size))
 		order = np.abs(np.int(order))
@@ -37,6 +63,8 @@ def savitzky_golay(y, window_size, order, deriv = 0, rate = 1):
 		raise TypeError('window_size size must be a positive odd number')
 	if window_size < order + 2:
 		raise TypeError('window_size is too small for the polynomials order')
+
+	# set up
 	order_range = range(order + 1)
 	half_window = (window_size -1) // 2
 	b = np.mat([[k ** i for i in order_range] for k in range(-half_window, half_window + 1)])
@@ -44,9 +72,14 @@ def savitzky_golay(y, window_size, order, deriv = 0, rate = 1):
 	firstvals = y[0] - np.abs(y[1 : half_window + 1][:: -1] - y[0])
 	lastvals = y[-1] + np.abs(y[-half_window - 1 : -1][:: -1] - y[-1])
 	y = np.concatenate((firstvals, y, lastvals))
+
 	return np.convolve(m[:: -1], y, mode = 'valid')
 
+################################################################################
+
 if __name__ == '__main__':
+
+	# create empty dictionary to save parameters to MAT file
 	h = {
 		'1466015503703t.mat' : [0, 0, 0, 0, 0],
 		'1501199875790165t.mat' : [0, 0, 0, 0, 0],
@@ -73,43 +106,73 @@ if __name__ == '__main__':
 		'850022758091.mat' : [0, 0, 0, 0, 0],
 		'8948760622563097.mat' : [0, 0, 0, 0, 0],
 		'992493553292811149.mat' : [0, 0, 0, 0, 0],
-		'65599.mat' : [0, 0, 0, 0, 0]
+		'65599.mat' : [0, 0, 0, 0, 0],
+		'6676181896971476057.mat' : [0, 0, 0, 0, 0],
+		'44816101156119797339.mat' : [0, 0, 0, 0, 0],
+		'6827596968971589571.mat' : [0, 0, 0, 0, 0]
 	}
-	# for i in h.keys():
-	# 	print(type(i))
-	# raise SystemExit
+
+	# for each file, try to generate correct parameters
+	# to allow for some error, random biases have been added
 	for file in h.keys():
-		file = sys.argv[1]
+
+		# load traces
 		traces = scipy.io.loadmat(file)
 		t = traces['Trace_1'][:, 0]
 		b = traces['Trace_1'][:, 1]
 		s = traces['Trace_2'][:, 1]
 		p = traces['Trace_3'][:, 1]
 		f = savitzky_golay(p, 35, 10)
+
+		# determine 'last' approximately
 		j1 = 0
 		for i in range(50, len(t) - 51):
+
+			# median is not affected by huge changes in sampe values
+			# hence, it is being used rather than arithmetic mean
 			m = np.median(f[i : i + 50])
+
+			# regularise the median using arithmetic mean of a smaller window
 			for k in range(10, len(t) - 11):
 				km = np.average(f[k : k + 10])
 				if km > m:
 					km = (km - m) / km + 0.1 * m
 				m += 0.001 * km
+
+			# approximate location
 			if m < -0.9:
 				j1 = i
 				# print(i, m)
+		last = j1 + np.random.randint(50)
+
+		# determine 'first' approximately
 		j2 = 0
 		for i in range(len(t) - 51, 50, -1):
+
+			# median is not affected by huge changes in sampe values
+			# hence, it is being used rather than arithmetic mean
 			m = np.median(f[i : i + 50])
-			# print(m)
+
+			# regularise the median using arithmetic mean of a smaller window
+			for k in range(10, len(t) - 11):
+				km = np.average(f[k : k + 10])
+				if km > m:
+					km = (km - m) / km + 0.1 * m
+				m += 0.001 * km
+
+			# approximate location
 			if m < 0:
 				j2 = i
 				# print(i, m)
-		last = j1 + np.random.randint(50)
 		first = j2 - np.random.randint(50)
+
+		# 'peak' and 'limit' were found by observation
+		# however, to avoid excessive runtime, some have been hard-coded in 'dpa.mat'
+		# to prevent them from being overwritten, this script will save to 'dpa2.mat'
 		peak = np.amax(f) - 0.03
 		limit = 50
-		threshold = 500
-		# peak, limit, threshold, first, last = scipy.io.loadmat('dpa.mat')[file][0]
+
+		# break the trace into segments, one segment for each bit
 		start = first
 		signatures = []
 		for i in range(int(first), int(last + 1)):
@@ -121,11 +184,14 @@ if __name__ == '__main__':
 		if i - start > limit:
 			signatures.append(f[start : i])
 		bits = np.array([len(i) for i in signatures])
-		# bits[bits <= threshold] = 0
-		# bits[bits > threshold] = 1
 		bits = bits[:: -1]
 		# print(signatures)
+
+		# perform Otsu's Thresholding on these length values
 		threshold = otsu(bits)
+
+		# write the parameters to the dictionary
 		h[file] = [peak, limit, threshold, first, last]
 		print(h[file])
+
 	scipy.io.savemat('dpa2.mat', h)
