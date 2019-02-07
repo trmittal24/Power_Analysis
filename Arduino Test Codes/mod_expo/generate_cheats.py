@@ -25,10 +25,10 @@ def otsu(gray):
 	for t in bins[1 : -1]:
 
 		# calculate inter-class variance
-		Wb = np.sum(his[:t]) * mean_weigth
-		Wf = np.sum(his[t:]) * mean_weigth
-		mub = np.mean(his[:t])
-		muf = np.mean(his[t:])
+		Wb = np.sum(his[: t]) * mean_weigth
+		Wf = np.sum(his[t :]) * mean_weigth
+		mub = np.mean(his[: t])
+		muf = np.mean(his[t :])
 		value = Wb * Wf * (mub - muf) ** 2
 		print('Wb', Wb, 'Wf', Wf)
 		print('t', t, 'value', value)
@@ -170,7 +170,7 @@ if __name__ == '__main__':
 		# however, to avoid excessive runtime, some have been hard-coded in 'dpa.mat'
 		# to prevent them from being overwritten, this script will save to 'dpa2.mat'
 		peak = np.amax(f) - 0.03
-		limit = 50
+		limit = 160
 
 		# break the trace into segments, one segment for each bit
 		start = first
