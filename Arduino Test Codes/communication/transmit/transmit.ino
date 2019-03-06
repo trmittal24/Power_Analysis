@@ -86,7 +86,7 @@ void loop()
   // set the RSA parameters
   load_parameters();
   n = p * q;
-  M = "58373258";
+  M = "82452";
   
   // encrypt 'M' to get 'C'
   C = "1";
@@ -100,8 +100,8 @@ void loop()
     e /= 2;
     temp = temp * temp % n;
   }
-  Serial.print("C = ");
-  Serial.println(C);
+//  Serial.print("C = ");
+//  Serial.println(C);
 
   // convert BigNumber to uint64_t
   int cipher[64] = {0};
@@ -124,32 +124,45 @@ void loop()
       result = result * 2;
     }
   }
-  Serial.print("C = ");
-  print64(result);
+//  Serial.print("C = ");
+//  print64(result);
 
-    uint32_t x,y;
-  uint64_t a;
-    
+////////////////////////////////////////////////////////////////////////////////
 
-  int k =0;
-  a = (0x100000000);
-  x = C % a;
-  PORTB |= 0x10;
-  for(k=0; k<4; k++)
-  {
-    Serial.write(x%256);
-    x = x >>8;
-  }
-
-  x = C >> 32;
-  
-  for(k=0; k<4; k++)
-  {
-    Serial.write(x%256);
-    x = x >>8;
-  }
-  //Serial.write(24);
-  PORTB &= ~0x10;
+//    uint32_t x,y;
+//  uint64_t a;
+//    
+//
+//  int k =0;
+//  a = (0x100000000);
+//  x = C % a;
+//  PORTB |= 0x10;
+//  for(k=0; k<4; k++)
+//  {
+//    Serial.write(x%256);
+//    x = x >>8;
+//  }
+//
+//  x = C >> 32;
+//  
+//  for(k=0; k<4; k++)
+//  {
+//    Serial.write(x%256);
+//    x = x >>8;
+//  }
+//  //Serial.write(24);
+//  PORTB &= ~0x10;
+////////////////////////////////////////////////////////////////////////////////
   // break 'result' into 8 chunks, each one of 8 bytes
   // send those 8 bytes one after another over UART
+
+
+  // what about this?
+  for(int k = 0; k < 8; k++)
+  {
+    uint8_t x = result % 256;
+    Serial.write(x);
+//    Serial.println(x);
+    result >>= 8;
+  }
 }

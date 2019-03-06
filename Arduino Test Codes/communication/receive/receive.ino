@@ -114,7 +114,12 @@ void loop()
 
   uint64_t ans = receive();
   print64(ans);
-  C = ans;
+//  C = ans;
+
+//while(Serial.available())
+//{
+//  Serial.println(Serial.read());
+//}
   
 //  while(Serial.available())
 //  {
