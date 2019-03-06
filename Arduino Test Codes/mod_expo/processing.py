@@ -60,6 +60,7 @@ def get_signatures(file, traces):
 
 	# load parameters using one of the following two lines
 	peak, limit, threshold, first, last = scipy.io.loadmat('dpa.mat')[file][0]
+	print(peak, limit, threshold, first, last)
 	# peak, limit, threshold, first, last = [-0.839, 50, 400, 2318, 24241]
 
 	# explanation of the parameters

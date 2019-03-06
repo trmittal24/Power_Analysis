@@ -5,7 +5,7 @@ import matplotlib.pyplot as pp
 import numpy as np
 import scipy.io
 import sys
-
+import time
 ################################################################################
 
 def otsu(gray):
@@ -96,8 +96,8 @@ if __name__ == '__main__':
 		# '18702745650660789.mat' : [0, 0, 0, 0, 0],
 		# '2324818243004987.mat' : [0, 0, 0, 0, 0],
 		# '24967491312354467.mat' : [0, 0, 0, 0, 0],
-		# '26499063470653493.mat' : [0, 0, 0, 0, 0],
-		'34277.mat' : [0, 0, 0, 0, 0]
+		 '26499063470653493.mat' : [0, 0, 0, 0, 0],
+		#'34277.mat' : [0, 0, 0, 0, 0]
 		# '384945969131490773.mat' : [0, 0, 0, 0, 0],
 		# '422890635578730455.mat' : [0, 0, 0, 0, 0],
 		# '51280870137213061.mat' : [0, 0, 0, 0, 0],
@@ -105,13 +105,14 @@ if __name__ == '__main__':
 		# '70994704783375.mat' : [0, 0, 0, 0, 0],
 		# '850022758091.mat' : [0, 0, 0, 0, 0],
 		# '8948760622563097.mat' : [0, 0, 0, 0, 0],
-		# '992493553292811149.mat' : [0, 0, 0, 0, 0],
+		#'992493553292811149.mat' : [0, 0, 0, 0, 0],
 		# '65599.mat' : [0, 0, 0, 0, 0],
 		# '6676181896971476057.mat' : [0, 0, 0, 0, 0],
 		# '44816101156119797339.mat' : [0, 0, 0, 0, 0],
 		# '6827596968971589571.mat' : [0, 0, 0, 0, 0]
 	}
 
+	start_time = time.time()
 	# for each file, try to generate correct parameters
 	# to allow for some error, random biases have been added
 	for file in h.keys():
@@ -122,8 +123,42 @@ if __name__ == '__main__':
 		b = traces['Trace_1'][:, 1]
 		s = traces['Trace_2'][:, 1]
 		p = traces['Trace_3'][:, 1]
-		f = savitzky_golay(p, 35, 10)
+		#f = savitzky_golay(p, 50, 10)
+		f = scipy.signal.savgol_filter(x, 3500, 10000)
+		alpha = 20
 
+		avgs = [0 for i in range(len(f)/alpha)]
+		
+
+		for i in range(0,len(f)-401,alpha):
+			#avgs[i/alpha] = np.median(f[i:i+400])
+			max_interval = 0
+			min_interval = 0
+			for k in range(i,i+400):
+				if(f[k]>max_interval):
+					max_interval = f[k]
+				if(f[k]<min_interval):
+					min_interval = f[k]
+
+			max_interval = max_interval + 0.05
+			min_interval = min_interval - 0.05
+
+			count = 0
+			for k in range(i,i+400):
+				if((f[k]<max_interval) or (f[k]>min_interval)):
+					count = count + 1
+					avgs[i/alpha] = (avgs[i/alpha]+ f[k])/count
+
+		with open('average.txt', 'w') as ff:
+			for item in f:
+				ff.write("%s\n" % item)
+
+	end_time = time.time()
+
+	print(start_time - end_time)
+
+	print(np.average(f))
+'''
 		# determine 'last' approximately
 		j1 = 0
 		for i in range(50, len(t) - 51):
@@ -195,3 +230,6 @@ if __name__ == '__main__':
 		print(h[file])
 
 	scipy.io.savemat('dpa2.mat', h)
+	'''
+
+	
