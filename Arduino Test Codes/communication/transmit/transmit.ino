@@ -126,6 +126,30 @@ void loop()
   }
   Serial.print("C = ");
   print64(result);
+
+    uint32_t x,y;
+  uint64_t a;
+    
+
+  int k =0;
+  a = (0x100000000);
+  x = C % a;
+  PORTB |= 0x10;
+  for(k=0; k<4; k++)
+  {
+    Serial.write(x%256);
+    x = x >>8;
+  }
+
+  x = C >> 32;
+  
+  for(k=0; k<4; k++)
+  {
+    Serial.write(x%256);
+    x = x >>8;
+  }
+  //Serial.write(24);
+  PORTB &= ~0x10;
   // break 'result' into 8 chunks, each one of 8 bytes
   // send those 8 bytes one after another over UART
 }
