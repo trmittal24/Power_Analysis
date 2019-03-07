@@ -86,7 +86,7 @@ void loop()
   // set the RSA parameters
   load_parameters();
   n = p * q;
-  M = "82452";
+  M = "10";
   
   // encrypt 'M' to get 'C'
   C = "1";
@@ -156,13 +156,27 @@ void loop()
   // break 'result' into 8 chunks, each one of 8 bytes
   // send those 8 bytes one after another over UART
 
-
+  uint8_t x[8]={0} ;
   // what about this?
+  
   for(int k = 0; k < 8; k++)
   {
-    uint8_t x = result % 256;
-    Serial.write(x);
-//    Serial.println(x);
+    x[k] = result % 256;
+   //Serial.println(x);
     result >>= 8;
   }
+  
+
+  //while(1)
+  //{
+    PORTB |= 0x10;
+    //Serial.println("New");
+    for(int k = 0; k < 8; k++)
+    {
+     //Serial.println(x[k]);
+     Serial.write(x[k]);
+    }
+    PORTB &= ~0x10;
+  //} 
+  
 }

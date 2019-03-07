@@ -159,4 +159,4 @@ if __name__ == '__main__':
 	pp.ylabel('voltage / V')
 	pp.legend()
 	pp.grid(True, linewidth = 0.4)
-	# pp.show()
+	pp.show()

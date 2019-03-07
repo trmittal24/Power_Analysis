@@ -80,7 +80,7 @@ uint64_t receive()
 
 void setup()
 {
-  Serial.begin(2000000);
+  Serial.begin(115200);
   pinMode(12, OUTPUT);
   pinMode(11, OUTPUT);
   pinMode(2, OUTPUT);
