@@ -4,10 +4,10 @@ uint64_t n, p, q, M, e, d, C, temp, waste;
 
 void load_parameters()
 {
-  p = 23831; q = 65657; e = 342202493; d = 34277;
+ // p = 23831; q = 65657; e = 342202493; d = 34277;
 //  p = 88993; q = 652361; e = 25728589759; d = 65599;
 //  p = 82839349; q = 64629403; e = 663618299; d = 2324818243004987;
-//  p = 1598669; q = 9654637; e = 59796733427; d = 850022758091;
+ p = 1598669; q = 9654637; e = 59796733427; d = 850022758091;
 //  p = 8546999; q = 9764663; e = 6137965949564399; d = 70994704783375;
 //  p = 792179; q = 98796457; e = 98756664949787954613259; d = 4436988421939;
 //  p = 9547133; q = 7798798571; e = 655332465895669; d = 18702745650660789;
@@ -80,7 +80,7 @@ uint64_t receive()
 
 void setup()
 {
-  Serial.begin(115200);
+  Serial.begin(2000000);
   pinMode(12, OUTPUT);
   pinMode(11, OUTPUT);
   pinMode(2, OUTPUT);
@@ -108,12 +108,12 @@ void loop()
 //    e >>= 1;
 //    temp = temp * temp % n;
 //  }
-
-  int k=0;
-  int num[8]= {0};
-
-  uint64_t ans = receive();
-  print64(ans);
+//
+//  int k=0;
+//  int num[8]= {0};
+//
+//  uint64_t ans = receive();
+//  print64(ans);
 //  C = ans;
 
 //while(Serial.available())
@@ -141,6 +141,8 @@ void loop()
 
   
   // decrypt 'C' to get 'M'
+  C = receive();
+  print64(C);
   C = C % n;
   M = 1;
   temp = C;
