@@ -96,6 +96,13 @@ def get_signatures(file, traces):
 	# load parameters using one of the following two lines
 	# peak, limit, threshold, first, last = scipy.io.loadmat('dpa.mat')[file][0]
 	peak, limit, first, last = [-0.839, 160, 1342, 26885]
+	try:
+		# peak, limit, first, last = [float(i) for i in sys.argv[2 : 6]]
+		first = float(sys.argv[2])
+		last = float(sys.argv[3])
+	except:
+		pass
+
 
 	# explanation of the parameters
 	# 	peak = maximum value - 0.03
