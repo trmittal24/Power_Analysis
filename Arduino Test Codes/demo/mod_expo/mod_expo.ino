@@ -1,14 +1,24 @@
+/**
+ *
+ * HOW TO BREAK:
+ *
+ * LOOK FOR BLOCK-SPIKE-BLOCK REPRESENTING A 1 WHILE A BLOCK REPRESENTS A 0
+ *
+ * The MSB (last signature) will always be a '1' since the operations stop when exponent becomes 0.
+ *
+ *
+ */
+
 uint64_t n, p, q, M, e, d, C, temp, waste;
 
 ////////////////////////////////////////////////////////////////////////////////
 
 void load_parameters()
 {
-  p = 5;q=11;e=33;d=17;
- // p = 23831; q = 65657; e = 342202493; d = 34277;
-//  p = 88993; q = 652361; e = 25728589759; d = 65599;
+//  p = 23831; q = 65657; e = 342202493; d = 34277;
+  p = 88993; q = 652361; e = 25728589759; d = 65599;
 //  p = 82839349; q = 64629403; e = 663618299; d = 2324818243004987;
-// p = 1598669; q = 9654637; e = 59796733427; d = 850022758091;
+//  p = 1598669; q = 9654637; e = 59796733427; d = 850022758091;
 //  p = 8546999; q = 9764663; e = 6137965949564399; d = 70994704783375;
 //  p = 792179; q = 98796457; e = 98756664949787954613259; d = 4436988421939;
 //  p = 9547133; q = 7798798571; e = 655332465895669; d = 18702745650660789;
@@ -34,84 +44,85 @@ void load_parameters()
 //  p = 58756499; q = 485415883; d = 1466015503703; e = 19834803414905483;
 //  p = 5358751; q = 877845251; d = 366503875927; e = 130542716600863;
 //  p = 7657571; q = 986254613; d = 91625968981; e = 1643994285535421;
-//  p = 752952671; q = 87525481; d = 22906492249; e = 42269236847669449;
+//	p = 752952671; q = 87525481; d = 22906492249; e = 42269236847669449;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 void print64(uint64_t num)
 {
-  char rev[128];
-  char *p = rev+1;
-  while (num)
-  {
-    *p++ = '0' + num % 10;
-    num /= 10;
-  }
-  p--;
-  while(p > rev)
-  {
-    Serial.print(*p--);
-  }
-  Serial.println();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-uint64_t receive()
-{
-  uint64_t ans = 0;
-  uint64_t num[8] = {0};
-  int k = 0;
-  while(Serial.available())
-  {
-    num[k] = Serial.read();
-    ans = ans + (num[k] << (8 * k));
-    k++;
-  }
-//  for(int i = 0; i < 8; i ++)
-//  {
-//    print64(num[i]);
-//  }
-  return ans;
-
+	char rev[128];
+	char *p = rev+1;
+	while (num)
+	{
+		*p++ = '0' + num % 10;
+		num /= 10;
+	}
+	p--;
+	while(p > rev)
+	{
+		Serial.print(*p--);
+	}
+	Serial.println();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 void setup()
 {
-  Serial.begin(2000000);
-  pinMode(12, OUTPUT);
-  pinMode(11, OUTPUT);
-  pinMode(2, OUTPUT);
-  //SREG &= ~0x80;
+	Serial.begin(2000000);
+	pinMode(12, OUTPUT);
+	pinMode(11, OUTPUT);
+	pinMode(2, OUTPUT);
+	SREG &= ~0x80;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 void loop()
 {
-  // set RSA parameters
-  load_parameters();
-  n = p * q;
+	// set RSA parameters
+	load_parameters();
+	n = p * q;
+	M = 65;
+// print64(n);
 
-  C = receive();
-  print64(C);
-  C = C % n;
-  M = 1;
-  temp = C;
-  PORTB |= 0x08;
-  while(d > 0)
-  {
-   // PORTB |= 0x10;
-    if(d % 2)
-    {
-      M = M * temp % n;
-    }
-    d >>= 1;
-    temp = temp * temp % n;
-  //  PORTB &= ~0x10;
-  }
-  PORTB &= ~0x08;
+	// encrypt 'M' to get 'C'
+	C = 1;
+	temp = M;
+	while(e)
+	{
+		if(e % 2)
+		{
+			C = C * temp % n;
+		}
+		e >>= 1;
+		temp = temp * temp % n;
+   print64(temp);print64(C);print64(e);
+	}
+// print64(C);
+// delay(2000000000);
+Serial.println("-----");
+
+	// decrypt 'C' to get 'M'
+	M = 1;
+	temp = C;
+	PORTB |= 0x08;
+	while(d)
+	{
+		PORTB |= 0x10;
+		if(d % 2)
+		{
+			M = M * temp % n;
+		}
+		else
+		{
+			waste = M * C;
+		}
+		d >>= 1;
+		temp = temp * temp % n;
+		PORTB &= ~0x10;
+	}
+	PORTB &= ~0x08;
+//	print64(M);
 }
